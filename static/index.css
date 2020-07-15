@@ -9,6 +9,24 @@ html {
 	overflow: hidden;
 }
 
+.canvas {
+	border-style: none;
+}
+
+#dice-controller {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+#controller {
+	display: flex;
+	justify-content: center;
+	height: 30px;
+	width: 100vw;
+}
+
 #page {
 	display: flex;
 	flex-direction: column;

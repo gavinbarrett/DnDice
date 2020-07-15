@@ -28801,67 +28801,140 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; if (obj != null) { var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-var DiceCanvas = function DiceCanvas() {
-  // create a reference to this object
-  var mount = (0, _react.useRef)(null);
-  var diName = 'di';
-  var renderer = null;
+function DiceCanvas() {
+  var radius = 2; // create a reference to this object
+
+  var mount = (0, _react.useRef)(null); // create a scene and camera object
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); // create and initialize the WebGL renderer
+
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth / 2, window.innerHeight / 2);
   (0, _react.useEffect)(function () {
-    var width = 600; //mount.current.clientWidth;
+    // initialize the renderer with the icosahedron
+    createIcosahedron();
+  });
 
-    var height = 600; //mount.current.clientHeight;
+  var create = function create() {
+    var mat = new THREE.MeshPhongMaterial({
+      side: THREE.DoubleSide
+    });
+    var hue = Math.random();
+    var sat = 1;
+    var lum = 0.5;
+    mat.color.setHSL(hue, sat, lum);
+    return mat;
+  };
 
-    var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); // generate a material for the object (object + material = mesh)
+  var createTetrahedron = function createTetrahedron() {
+    var tetra = new THREE.TetrahedronGeometry(radius);
+    animatePolygon(tetra);
+  };
 
-    var create = function create() {
-      var mat = new THREE.MeshPhongMaterial({
-        side: THREE.DoubleSide
-      });
-      var hue = Math.random();
-      var sat = 1;
-      var lum = 0.5;
-      mat.color.setHSL(hue, sat, lum);
-      return mat;
-    }; // create a renderer
+  var createCube = function createCube() {
+    var cube = new THREE.BoxGeometry(radius, radius, radius);
+    animatePolygon(cube);
+  };
 
+  var createOctahedron = function createOctahedron() {
+    var octa = new THREE.OctahedronGeometry(radius);
+    animatePolygon(octa);
+  };
 
-    renderer = new THREE.WebGLRenderer(); // initialize the size of the renderer
+  var createIcosahedron = function createIcosahedron() {
+    var icosa = new THREE.IcosahedronGeometry(radius);
+    animatePolygon(icosa);
+  };
 
-    renderer.setSize(window.innerWidth / 2, window.innerHeight / 2); // insert the renderer into the React page
+  var createDodecahedron = function createDodecahedron() {
+    var dodeca = new THREE.DodecahedronGeometry(radius);
+    animatePolygon(dodeca);
+  };
 
-    renderer.domElement.name = diName;
+  var addPolygon = function addPolygon(mesh) {
+    // add object to the scene
+    scene.add(mesh); // add renderer to the React page
+
     mount.current.appendChild(renderer.domElement);
-    var radius = 2;
-    var ico = new THREE.IcosahedronGeometry(radius);
+  };
+
+  var animatePolygon = function animatePolygon(polygon) {
+    // create the mesh object
     var mat = new THREE.MeshNormalMaterial();
-    var mesh = new THREE.Mesh(ico, mat);
-    scene.add(mesh);
-    camera.position.z = 5;
+    var mesh = new THREE.Mesh(polygon, mat);
+    camera.position.z = 5; // add object to scene and renderer to page
+
+    addPolygon(mesh);
 
     var animate = function animate() {
       requestAnimationFrame(animate);
-      mesh.rotation.x += 0.01;
       mesh.rotation.y += 0.01;
       renderer.render(scene, camera);
-    };
+    }; // run the die's animation
+
 
     animate();
-  });
+  };
 
-  var changeDice = function changeDice() {
-    mount.current.removeChild(renderer.domElement);
+  var removePolygon = function removePolygon() {
+    // remove renderer from the React page
+    mount.current.removeChild(renderer.domElement); // remove the polygon from the scene
+
+    scene.remove(scene.children[0]);
+  };
+
+  var changeDie = function changeDie(value) {
+    if (value > 1 && value < 21) {
+      if (value == 4) {
+        removePolygon();
+        createTetrahedron();
+      } else if (value == 6) {
+        removePolygon();
+        createCube();
+      } else if (value == 8) {
+        removePolygon();
+        createOctahedron();
+      } else if (value == 12) {
+        removePolygon();
+        createDodecahedron();
+      } else if (value == 20) {
+        removePolygon();
+        createIcosahedron();
+      }
+    }
   };
 
   return (
     /*#__PURE__*/
     _react["default"].createElement("div", {
+      id: "dice-controller"
+    },
+    /*#__PURE__*/
+    _react["default"].createElement("div", {
+      id: "controller"
+    },
+    /*#__PURE__*/
+    _react["default"].createElement("input", {
+      id: "number",
+      type: "number",
+      defaultValue: "20",
+      min: "2",
+      max: "20",
+      onChange: function onChange(e) {
+        return changeDie(e.target.value);
+      }
+    })),
+    /*#__PURE__*/
+    _react["default"].createElement("div", {
       id: "animation",
       ref: mount,
-      onClick: changeDice
-    })
+      onClick: function onClick() {
+        return console.log('The canvas was clicked!');
+      }
+    }))
   );
-};
+}
 
 function Heading() {
   return (
@@ -28869,15 +28942,6 @@ function Heading() {
     _react["default"].createElement("div", {
       id: "heading"
     }, "DnDice")
-  );
-}
-
-function Canvas() {
-  return (
-    /*#__PURE__*/
-    _react["default"].createElement("div", {
-      id: "canv"
-    })
   );
 }
 
