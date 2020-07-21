@@ -5,14 +5,20 @@ html {
 	top: 0px;
 	position: absolute;
 	background-color: purple;
-	overflow-x: hidden;
 	overflow: hidden;
+	overflow-x: hidden;
 }
 
 .canvas {
 	border-style: none;
 	display: flex;
 	justify-content: center;
+}
+
+.dtab {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 #dice-controller {
@@ -22,11 +28,19 @@ html {
 	align-items: center;
 }
 
+#selector {
+	width: 65vw;
+	height: 12vh;
+	display: flex;
+	justify-content: space-evenly;
+	background-color: black;
+}
+
 #controller {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	height: 30px;
+	height: 10vh;
 	width: 100vw;
 }
 
