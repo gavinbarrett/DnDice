@@ -21,6 +21,22 @@ html {
 	align-items: center;
 }
 
+.dcount {
+	color: white;
+	display: flex;
+	justify-content: flex-end;
+	align-items: flex-end;
+	font-family: 'Grenze Gotisch', cursive;
+	z-index: 5;
+}
+
+#sum {
+	z-index: 5;
+	color: white;
+	font-size: 10vw;
+	font-family: 'Grenze Gotisch', cursive;
+}
+
 #dice-controller {
 	display: flex;
 	flex-direction: column;
