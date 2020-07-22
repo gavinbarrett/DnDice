@@ -124,10 +124,10 @@ function DiceCanvas(props) {
         // update the DiceManager with the new values
         DiceManager.prepareValues(diceValues);
         // sum up all of the die values
-        sumUpsides();
+        sumUpDice();
     }
 
-    let sumUpsides = () => {
+    let sumUpDice = () => {
         let faceSum = 0;
         // sum the dice faces facing up
         for (let i = 0; i < props.dv.length; i++)
