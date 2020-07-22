@@ -1,6 +1,6 @@
 'use strict';
-//import * as CANNON from 'cannon';
-//import * as THREE from 'three';
+import * as CANNON from 'cannon';
+import * as THREE from 'three';
 
 class DiceManagerClass {
     constructor() {
