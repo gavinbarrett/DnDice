@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import { useState } from 'react';
 import ReactDOM from 'react-dom';
-import {DiceCanvas, DieSelector} from './index.jsx';
+import { DiceCanvas, DieSelector } from './index.jsx';
 
 function DnDice(props) {
 	
@@ -26,4 +26,5 @@ function DnDice(props) {
 	</div>);
 }
 
+// render the D&Dice application
 ReactDOM.render(<DnDice heading={"D&Dice"} />, document.getElementById('root'));

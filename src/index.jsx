@@ -8,26 +8,46 @@ function DieTab(props) {
 	mount = useRef(null);
 	
 	let init = () => {
+		// set up a CANNON world without gravity and initialize the DiceManager
+		setupWorld();
+		// create a perspective camera
+		setupCamera();
+		// create a WebGL renderer
+		setupRenderer();
+		// create the corresponding die icon
+		die = createDieIcon();
+		// add the die to the DieTab
+		addElements();
+	}
+
+	let addLighting = () => {
+		let ambient = new THREE.AmbientLight('#ffffff', 0.3);
+		let directionalLight = new THREE.DirectionalLight('#ffffff', 0.5);
+		directionalLight.position.x = -1000;
+		directionalLight.position.y = 1000;
+		directionalLight.position.z = 1000;
+
+		// add lighting to the scene
+		scene.add(ambient);
+		scene.add(directionalLight);
+	}
+
+	let setupWorld = () => {
 		scene = new THREE.Scene();
+		let world = new CANNON.World();
+		DiceManager.setWorld(world);
+		addLighting();
+	}
+
+	let setupCamera = () => {
 		camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 		camera.position.z = 5;
+	}
+
+	let setupRenderer = () => {
 		// create and initialize the WebGL renderer
 		renderer = new THREE.WebGLRenderer();
 		renderer.setSize(window.innerWidth/10, window.innerHeight/10);
-		
-		let world = new CANNON.World();
-		DiceManager.setWorld(world);
-		let ambient = new THREE.AmbientLight('#ffffff', 0.3);
-	    let directionalLight = new THREE.DirectionalLight('#ffffff', 0.5);
-    	directionalLight.position.x = -1000;
-    	directionalLight.position.y = 1000;
-    	directionalLight.position.z = 1000;
-
-    	// add lighting to the scene
-		scene.add(ambient);
-		scene.add(directionalLight);
-	
-		die = createDie();
 	}
 
 	let animate = () => {
@@ -37,7 +57,7 @@ function DieTab(props) {
 		requestAnimationFrame(animate);
 	}
 
-	let createDie = () => {
+	let createDieIcon = () => {
 		let icon_size = 2;
 		switch(props.faces) {
 			case 4:
@@ -61,11 +81,14 @@ function DieTab(props) {
 	}
 
 	let addElements = async () => {
+		// add the die icon to
 		scene.add(die.getObject());
+		// add the die to the scene
 		mount.current.appendChild(renderer.domElement);
 	}
 
 	let addDie = () => {
+		// add a new die to the DiceCanvas
 		let new_dice;
 		let icon_size = 2;
 		switch(props.faces) {
@@ -112,9 +135,9 @@ function DieTab(props) {
 	return (<div className='dtab'>
 		<div ref={mount} className='dtab' onClick={() => { addDie() }}>
 		</div>
-	<div className='dcount'>
-		x{props.num}
-	</div>
+		<div className='dcount'>
+			x{props.num}
+		</div>
 	</div>);
 }
 
@@ -134,11 +157,11 @@ function DieSelector(props) {
 function DiceCanvas(props) {
 	
 	// declare function variables
-	let world, camera, mount, renderer, dice = [];
-	
+	let world, camera, mount, renderer = [];
+
+	const [sum, changeSum] = useState(null);
 	// create a reference to this object
 	mount = useRef(null);
-	const [sum, updateSum] = useState(0);
 
 	let init = () => {
 		// set up a CANNON world with gravity and initialize the DiceManager
@@ -149,9 +172,6 @@ function DiceCanvas(props) {
 		setupRenderer();
 		// add the scene to the React page
 		addScene();
-
-		requestAnimationFrame(animate);
-
 		// run the die's animation
 		animate();
 	}
@@ -161,68 +181,16 @@ function DiceCanvas(props) {
 		mount.current.appendChild(renderer.domElement);
 	}
 
-	let updatePhysics = () => {
-		// increment the CANNON world step
-		world.step(1.0 / 60.0);
-		// update dice physics
-		props.d.forEach(die => die.updateMeshFromBody());
-	}
-
-	let setupWorld = (gravity=false) => {
-		// set up a new cannon world with gravity
-		world = new CANNON.World();
-		if (gravity)
-			world.gravity.set(0, -9.82 * 20, 0);
-		// configure the world of the threejs-dice dice manager
-		DiceManager.setWorld(world);
-		// add a floor to both the scene and the world
-		addFloor();
-		// add lighting to the world
-		addLighting();
-	}
-
-	let setupRenderer = () => {
-		// initialize the WebGL renderer
-		renderer = new THREE.WebGLRenderer();
-		renderer.setSize(window.innerWidth/1.5, window.innerHeight/1.5);
-	}
-
-	let setupCamera = () => {
-		camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
-		camera.position.x = 5;
-		camera.position.z = 30;
-		camera.position.y = 7;
-		camera.zoom = 100;
-	}
-
 	let addLighting = () => {
 		// create lighting
 		let ambient = new THREE.AmbientLight('#ffffff', 0.3);
-	    let directionalLight = new THREE.DirectionalLight('#ffffff', 0.5);
-    	directionalLight.position.x = -1000;
-    	directionalLight.position.y = 1000;
-    	directionalLight.position.z = 1000;
-    	// add lighting to the scene
+		let directionalLight = new THREE.DirectionalLight('#ffffff', 0.5);
+		directionalLight.position.x = -1000;
+		directionalLight.position.y = 1000;
+		directionalLight.position.z = 1000;
+		// add lighting to the scene
 		props.chsc(sc => sc.add(ambient));
 		props.chsc(sc => sc.add(directionalLight));
-	}
-
-	let dieConstructor = (val) => {
-		let die_size = 2;
-		switch(parseInt(val)) {
-			case 4:
-				return new DiceD4({size: die_size, backColor: '#ff0000'}); // return a D4 - Tetrahedron
-			case 6:
-				return new DiceD6({size: die_size, backColor: '#ffff00'}); // return a D6 - Cube
-			case 8:
-				return new DiceD8({size: die_size, backColor: '#ff00ff'}); // return a D8 - Octohedron
-			case 10:
-				return new DiceD10({size: die_size, backColor: '#0000ff'}); // return a D10 - Decahedron
-			case 12:
-				return new DiceD12({size: die_size, backColor: '#00ff00'}); // return a D12 - Dodecahedron
-			default:
-				return new DiceD20({size: die_size, backColor: '#ff00f0'}); // return a D20 - Icosahedron
-		}
 	}
 
 	let addFloor = () => {
@@ -242,56 +210,39 @@ function DiceCanvas(props) {
 		world.add(floorBody);
 	}
 
-	let createDie = async (val) => {
-
-		val = parseInt(val);
-
-		//let diceValues = [];
-		let die = dieConstructor(val);
-
-		//diceValues.push({dice: die, value: val});
-
-		// set the values
-		//DiceManager.prepareValues(diceValues);
-		// add the object to the scene
-		//scene.add(die.getObject());
-		//for (let i in props.d) {
-		//	scene.add(props.d[i].getObject());
-		//}
-		props.chsc(sc => sc.add(die.getObject()));
-		//dice.push(die);
-		//console.log(dice);
-		// add the scene to the react page
-		//mount.current.appendChild(renderer.domElement);
-
-
-		//die.updateBodyFromMesh()
-		//console.log(die.getUpsideValue());
-		
-		requestAnimationFrame(animate);
-
-		// run the die's animation
-		animate();
+	let setupWorld = (gravity=false) => {
+		// set up a new cannon world with gravity
+		world = new CANNON.World();
+		if (gravity)
+			world.gravity.set(0, -9.82 * 20, 0);
+		// configure the world of the threejs-dice dice manager
+		DiceManager.setWorld(world);
+		// add a floor to both the scene and the world
+		addFloor();
+		// add lighting to the world
+		addLighting();
 	}
 
-	let setDice = () => {
+	let setupCamera = () => {
+		// create a camera for the scene
+		camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
+		camera.position.x = 5;
+		camera.position.z = 30;
+		camera.position.y = 7;
+		camera.zoom = 100;
+	}
 
-		// add the scene to the react page
-		mount.current.appendChild(renderer.domElement);
+	let setupRenderer = () => {
+		// initialize the WebGL renderer
+		renderer = new THREE.WebGLRenderer();
+		renderer.setSize(window.innerWidth/1.5, window.innerHeight/1.5);
+	}
 
-		// create a floor for the scene
-		let floorMaterial = new THREE.MeshPhongMaterial( { color: '#222222', side: THREE.DoubleSide } );
-		let floorGeometry = new THREE.PlaneGeometry(60, 60, 10, 10);
-		let floor = new THREE.Mesh(floorGeometry, floorMaterial);
-		floor.receiveShadow  = true;
-		floor.rotation.x = Math.PI / 2;
-
-		props.chsc(sc => sc.add(floor));
-		
-		requestAnimationFrame(animate);
-
-		// run the die's animation
-		animate();
+	let updatePhysics = () => {
+		// increment the CANNON world step
+		world.step(1.0 / 60.0);
+		// update dice physics
+		props.d.forEach(die => die.updateMeshFromBody());
 	}
 
 	let animate = () => {
@@ -303,14 +254,9 @@ function DiceCanvas(props) {
 		requestAnimationFrame(animate);
 	}
 
-	useEffect(() => {
-		// initialize necessary variables
-		init();
-	}, [mount]); // passing a second argument forces useEffect to run only once
-
 	let randomDiceThrow = () => {
         let diceValues = [];
-
+        // roll each die
         for (let i = 0; i < props.d.length; i++) {
             let yRand = Math.random() * 20;
             props.d[i].getObject().position.x = -15 - (i % 3) * 1.5;
@@ -322,31 +268,37 @@ function DiceCanvas(props) {
             let rand = Math.random() * 5;
             props.d[i].getObject().body.velocity.set(25 + rand, 40 + yRand, 15 + rand);
             props.d[i].getObject().body.angularVelocity.set(10 * Math.random() -10, 10 * Math.random() -10, 10 * Math.random() -10);
-
             diceValues.push({dice: props.d[i], value: i + 1});
 		}
+        // set the new dice values
 		props.udv(_ => diceValues);
+        // update the DiceManager with the new values
         DiceManager.prepareValues(diceValues);
-		sumUpside();
+		// sum up all of the die values
+        sumUpsides();
 	}
 
-	let sumUpside = () => {
+	let sumUpsides = () => {
 		let faceSum = 0;
 		// sum the dice faces facing up
 		for (let i = 0; i < props.dv.length; i++)
 			faceSum += props.dv[i]['dice'].getUpsideValue();
-		// add the sum to the canvas
-		document.getElementById('sum').textContent = faceSum;
+		// add any non-zero sum to the canvas
+		(faceSum === 0) ? changeSum(_ => null) : changeSum(_ => faceSum);
 	}
+
+	useEffect(() => {
+		// initialize necessary variables
+		init();
+	}, [mount]); // passing a second argument forces useEffect to run only once
 
 	return(<div id="dice-controller">
 	<div id="animation" ref={ mount } onClick={ async () => { 
 		// throw the dice when the canvas is clicked
-		console.log(props.d);
 		await randomDiceThrow();
 	}}/>
 	<div id="sum">
-		{/*the sum of all dice will be entered here*/}
+		{sum}{/*the sum of the dice will be entered here*/}
 	</div>
 	</div>);
 }
