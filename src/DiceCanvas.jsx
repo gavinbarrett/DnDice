@@ -1,13 +1,143 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
 import { useEffect, useRef, useState } from "react";
-import { DiceManager } from "./dice";
+import { DiceD10, DiceD12, DiceD20, DiceD4, DiceD6, DiceD8, DiceManager } from "./dice";
+
+const realScene = new THREE.Scene();
+const realDice = [];
+
+function DieTab(props) {
+
+    let scene, camera, mount, renderer, die = [];
+
+    mount = useRef(null);
+
+    let init = () => {
+        // set up a CANNON world without gravity and initialize the DiceManager
+        setupWorld();
+        // create a perspective camera
+        setupCamera();
+        // create a WebGL renderer
+        setupRenderer();
+        // create the corresponding die icon
+        die = createDie();
+        // add the die to the DieTab
+        addElements();
+    }
+
+    let addLighting = () => {
+        let ambient = new THREE.AmbientLight('#ffffff', 0.3);
+        let directionalLight = new THREE.DirectionalLight('#ffffff', 0.5);
+        directionalLight.position.x = -1000;
+        directionalLight.position.y = 1000;
+        directionalLight.position.z = 1000;
+        // add lighting to the scene
+        scene.add(ambient);
+        scene.add(directionalLight);
+    }
+
+    let setupWorld = () => {
+        scene = new THREE.Scene();
+        let world = new CANNON.World();
+        DiceManager.setWorld(world);
+        addLighting();
+    }
+
+    let setupCamera = () => {
+        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+    }
+
+    let setupRenderer = () => {
+        // create and initialize the WebGL renderer
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth/10, window.innerHeight/10);
+    }
+
+    let animate = () => {
+        renderer.render(scene, camera);
+        die.getObject().rotation.y += 0.01;
+        die.getObject().rotation.z += 0.01;
+        die.updateBodyFromMesh();
+        requestAnimationFrame(animate);
+    }
+
+    let createDie = () => {
+        let icon_size = 2;
+        switch(props.faces) {
+            case 4:
+                return new DiceD4({size: icon_size, backColor: '#ff0000'});
+            case 6:
+                return new DiceD6({size: icon_size, backColor: '#00ff00'});
+            case 8:
+                return new DiceD8({size: icon_size, backColor: '#0000ff'});
+            case 10:
+                return new DiceD10({size: icon_size, backColor: '#ff00ff'});
+            case 12:
+                return new DiceD12({size: icon_size, backColor: '#ffff00'});
+            default:
+                return new DiceD20({size: icon_size, backColor: '#ffa500'});
+        }
+    }
+
+    let render = () => {
+        requestAnimationFrame(animate);
+    }
+
+    let addElements = async () => {
+        // add the die icon to
+        scene.add(die.getObject());
+        // add the die to the scene
+        mount.current.appendChild(renderer.domElement);
+    }
+
+    let addDie = () => {
+        // add a new die to the DiceCanvas
+        let new_die = createDie();
+        // add a new die to the array
+        realDice.push(new_die);
+        // add the die to the scene
+        realScene.add(new_die.getObject());
+        // increment count for the die type
+        props.inc(props.num + 1);
+    }
+
+    useEffect(() => {
+        // initialize the scene
+        init();
+        // add the die icon to the tab
+        addElements();
+        // run the die animation
+        render();
+    }, [mount]);
+
+    return (<div className='dtab'>
+        <div ref={ mount } className='dtab' onClick={ () => addDie() }>
+        </div>
+        <div className='dcount'>
+            x{props.num}
+        </div>
+    </div>);
+}
+
+function DieSelector(props) {
+    return (<div id='controller'>
+        <div id='selector'>
+            <DieTab num={props.dcount[0]} inc={props.dcount[1]} faces={4}/>
+            <DieTab num={props.dcount[2]} inc={props.dcount[3]} faces={6}/>
+            <DieTab num={props.dcount[4]} inc={props.dcount[5]} faces={8}/>
+            <DieTab num={props.dcount[6]} inc={props.dcount[7]} faces={10}/>
+            <DieTab num={props.dcount[8]} inc={props.dcount[9]} faces={12}/>
+            <DieTab num={props.dcount[10]} inc={props.dcount[11]} faces={20}/>
+        </div>
+    </div>);
+}
 
 function DiceCanvas(props) {
 
     // declare function variables
-    let world, camera, mount, renderer = [];
-
+    let world, camera, renderer, mount = [];
+    // create a sum variable
     const [sum, changeSum] = useState(null);
     // create a reference to this object
     mount = useRef(null);
@@ -21,12 +151,15 @@ function DiceCanvas(props) {
         setupRenderer();
         // add the scene to the React page
         addScene();
+        // mount the renderer in the canvas
+        mnt();
         // run the die's animation
-        animate();
+        requestAnimationFrame(animate);
     }
 
     let addScene = () => {
         // insert the scene into the React functional component
+        //mount.current.appendChild(props.r.domElement);
         mount.current.appendChild(renderer.domElement);
     }
 
@@ -38,8 +171,8 @@ function DiceCanvas(props) {
         directionalLight.position.y = 1000;
         directionalLight.position.z = 1000;
         // add lighting to the scene
-        props.chsc(sc => sc.add(ambient));
-        props.chsc(sc => sc.add(directionalLight));
+        realScene.add(ambient);
+        realScene.add(directionalLight);
     }
 
     let addFloor = () => {
@@ -50,8 +183,8 @@ function DiceCanvas(props) {
         floor.receiveShadow  = true;
         floor.rotation.x = Math.PI / 2;
         // add a floor to the  scene
-        props.chsc(sc => sc.add(floor));
-
+        realScene.add(floor);
+        floor.position.set(0,-5,0);
         // create a CANNON floor
         let floorBody = new CANNON.Body({mass: 0, shape: new CANNON.Plane(), material: DiceManager.floorBodyMaterial});
         floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
@@ -83,44 +216,46 @@ function DiceCanvas(props) {
 
     let setupRenderer = () => {
         // initialize the WebGL renderer
+        //props.upr(_ => props.r.setSize(window.innerWidth/1.5, window.innerHeight/1.5));
         renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth/1.5, window.innerHeight/1.5);
+        //props.r.current.setSize(window.innerWidth/1.5, window.innerHeight/1.5);
     }
 
     let updatePhysics = () => {
         // increment the CANNON world step
         world.step(1.0 / 60.0);
         // update dice physics
-        props.d.forEach(die => die.updateMeshFromBody());
+        realDice.forEach(die => die.updateMeshFromBody());
     }
 
     let animate = () => {
         // update CANNON physics
         updatePhysics();
         // render the scene
-        renderer.render(props.sc, camera);
+        //props.upr(_ => props.r.render(realScene, camera));
+        renderer.render(realScene, camera);
         // call the animation function
         requestAnimationFrame(animate);
     }
 
-    let randomDiceThrow = () => {
+    let randomDiceThrow = async () => {
         let diceValues = [];
         // roll each die
-        for (let i = 0; i < props.d.length; i++) {
+        for (let i = 0; i < realDice.length; i++) {
             let yRand = Math.random() * 20;
-            props.d[i].getObject().position.x = -15 - (i % 3) * 1.5;
-            props.d[i].getObject().position.y = 2 + Math.floor(i / 3) * 1.5;
-            props.d[i].getObject().position.z = -15 + (i % 3) * 1.5;
-            props.d[i].getObject().quaternion.x = (Math.random()*90-45) * Math.PI / 180;
-            props.d[i].getObject().quaternion.z = (Math.random()*90-45) * Math.PI / 180;
-            props.d[i].updateBodyFromMesh();
+            realDice[i].getObject().position.x = -15 - (i % 3) * 1.5;
+            realDice[i].getObject().position.y = 2 + Math.floor(i / 3) * 1.5;
+            realDice[i].getObject().position.z = -15 + (i % 3) * 1.5;
+            realDice[i].getObject().quaternion.x = (Math.random() * 90 - 45) * Math.PI / 180;
+            realDice[i].getObject().quaternion.z = (Math.random() * 90 - 45) * Math.PI / 180;
+            realDice[i].updateBodyFromMesh();
             let rand = Math.random() * 5;
-            props.d[i].getObject().body.velocity.set(25 + rand, 40 + yRand, 15 + rand);
-            props.d[i].getObject().body.angularVelocity.set(10 * Math.random() -10, 10 * Math.random() -10, 10 * Math.random() -10);
-            diceValues.push({dice: props.d[i], value: i + 1});
+            realDice[i].getObject().body.velocity.set(25 + rand, 40 + yRand, 15 + rand);
+            realDice[i].getObject().body.angularVelocity.set(10 * Math.random() - 10, 10 * Math.random() - 10, 10 * Math.random() - 10);
+            diceValues.push({dice: realDice[i], value: i + 1});
         }
-        // set the new dice values
-        props.udv(_ => diceValues);
+
         // update the DiceManager with the new values
         DiceManager.prepareValues(diceValues);
         // sum up all of the die values
@@ -130,16 +265,18 @@ function DiceCanvas(props) {
     let sumUpDice = () => {
         let faceSum = 0;
         // sum the dice faces facing up
-        for (let i = 0; i < props.dv.length; i++)
-            faceSum += props.dv[i]['dice'].getUpsideValue();
+        for (let i = 0; i < realDice.length; i++)
+            faceSum += realDice[i].getUpsideValue();
         // add any non-zero sum to the canvas
         (faceSum === 0) ? changeSum(_ => null) : changeSum(_ => faceSum);
     }
 
+    let mnt = () => { mount.current.appendChild(renderer.domElement) }
+
     useEffect(() => {
         // initialize necessary variables
         init();
-    }, [mount]); // passing a second argument forces useEffect to run only once
+    }, []); // passing a second argument forces useEffect to run only once
 
     return(<div id="dice-controller">
         <div id="animation" ref={ mount } onClick={ async () => {
@@ -153,5 +290,6 @@ function DiceCanvas(props) {
 }
 
 export {
+    DieSelector,
     DiceCanvas
 }

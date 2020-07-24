@@ -1,5 +1,5 @@
 module.exports = {
-	entry: './src/index.jsx',
+	entry: './src/App.jsx',
 	mode: 'development',
 	module: {
 		rules: [
@@ -14,7 +14,7 @@ module.exports = {
 		extensions: ['*', '.js', '.jsx']
 	},
 	output: {
-		filename: 'index.js',
+		filename: 'App.js',
 		path: __dirname + '/dist',
 	},
 };
