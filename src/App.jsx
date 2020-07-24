@@ -1,6 +1,5 @@
 import ReactDOM from 'react-dom';
-import * as THREE from 'three';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { DieSelector, DiceCanvas } from './DiceCanvas';
 
 function DnDice(props) {

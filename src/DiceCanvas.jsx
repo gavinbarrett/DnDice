@@ -112,10 +112,10 @@ function DieTab(props) {
     }, [mount]);
 
     return (<div className='dtab'>
-        <div ref={ mount } className='dtab' onClick={ () => addDie() }>
-        </div>
-        <div className='dcount'>
-            x{props.num}
+        <div ref={ mount } className='dtab2' onClick={ () => addDie() }>
+            <div className='dcount'>
+                x{props.num}
+            </div>
         </div>
     </div>);
 }
@@ -178,7 +178,7 @@ function DiceCanvas(props) {
     let addFloor = () => {
         // create a floor for the scene
         let floorMaterial = new THREE.MeshPhongMaterial( { color: '#222222', side: THREE.DoubleSide } );
-        let floorGeometry = new THREE.PlaneGeometry(60, 60, 10, 10);
+        let floorGeometry = new THREE.PlaneGeometry(100, 100, 10, 10);
         let floor = new THREE.Mesh(floorGeometry, floorMaterial);
         floor.receiveShadow  = true;
         floor.rotation.x = Math.PI / 2;
@@ -207,10 +207,10 @@ function DiceCanvas(props) {
 
     let setupCamera = () => {
         // create a camera for the scene
-        camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.x = 5;
         camera.position.z = 30;
-        camera.position.y = 7;
+        camera.position.y = 10;
         camera.zoom = 100;
     }
 

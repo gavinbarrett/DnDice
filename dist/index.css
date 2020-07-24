@@ -6,7 +6,6 @@ html {
 	position: absolute;
 	background-color: #5f0f40;
 	overflow: hidden;
-	overflow-x: hidden;
 }
 
 .canvas {
@@ -20,18 +19,38 @@ html {
 	justify-content: center;
 	align-items: center;
 	background-color: #74546a;
+	position: relative;
 }
 
 .dtab:hover {
 	background-color: #843b62
 }
 
+.dtab2 {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: #74546a;
+	position: absolute;
+}
+
+.dcountWrap {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	left: 20px;
+}
+
 .dcount {
+	width: 100%;
+	height: 100%;
 	color: white;
 	display: flex;
-	justify-content: flex-end;
+	justify-content: right;
 	align-items: flex-end;
 	font-family: 'Grenze Gotisch', cursive;
+	position: absolute;
 	z-index: 5;
 }
 
@@ -87,12 +106,13 @@ html {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	font-size: 18vw;
+	font-size: 14vw;
 	font-family: 'Grenze Gotisch', cursive;
 	background-color: #e36414;
 	color: black;
 	width: 60vw;
-	height: 30vh;
+	height: 25vh;
+	border-radius: 10px;
 }
 
 #canv {
