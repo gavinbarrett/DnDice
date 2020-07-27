@@ -51,7 +51,7 @@ function DieTab(props) {
     let setupRenderer = () => {
         // create and initialize the WebGL renderer
         renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth/10, window.innerHeight/10);
+        renderer.setSize(window.innerWidth/11, window.innerHeight/11);
     }
 
     let animate = () => {
@@ -159,7 +159,6 @@ function DiceCanvas(props) {
 
     let addScene = () => {
         // insert the scene into the React functional component
-        //mount.current.appendChild(props.r.domElement);
         mount.current.appendChild(renderer.domElement);
     }
 
@@ -207,18 +206,18 @@ function DiceCanvas(props) {
 
     let setupCamera = () => {
         // create a camera for the scene
-        camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.x = 5;
-        camera.position.z = 30;
+        camera.position.z = 20;
         camera.position.y = 10;
-        camera.zoom = 100;
+        camera.zoom = 300;
     }
 
     let setupRenderer = () => {
         // initialize the WebGL renderer
         //props.upr(_ => props.r.setSize(window.innerWidth/1.5, window.innerHeight/1.5));
         renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth/1.5, window.innerHeight/1.5);
+        renderer.setSize(window.innerWidth/1.4, window.innerHeight/1.4);
         //props.r.current.setSize(window.innerWidth/1.5, window.innerHeight/1.5);
     }
 
@@ -243,6 +242,7 @@ function DiceCanvas(props) {
         let diceValues = [];
         // roll each die
         for (let i = 0; i < realDice.length; i++) {
+            console.log(realDice[i]);
             let yRand = Math.random() * 20;
             realDice[i].getObject().position.x = -15 - (i % 3) * 1.5;
             realDice[i].getObject().position.y = 2 + Math.floor(i / 3) * 1.5;
@@ -253,20 +253,24 @@ function DiceCanvas(props) {
             let rand = Math.random() * 5;
             realDice[i].getObject().body.velocity.set(25 + rand, 40 + yRand, 15 + rand);
             realDice[i].getObject().body.angularVelocity.set(10 * Math.random() - 10, 10 * Math.random() - 10, 10 * Math.random() - 10);
-            diceValues.push({dice: realDice[i], value: i + 1});
+            //console.log(realDice[i].faces.values);
+            //diceValues.push({dice: realDice[i], value: realDice[i].faces.values});
         }
 
         // update the DiceManager with the new values
-        DiceManager.prepareValues(diceValues);
+        //DiceManager.prepareValues(diceValues);
         // sum up all of the die values
-        sumUpDice();
+        //sumUpDice();
     }
 
     let sumUpDice = () => {
         let faceSum = 0;
+        let side = 0;
         // sum the dice faces facing up
         for (let i = 0; i < realDice.length; i++)
-            faceSum += realDice[i].getUpsideValue();
+            side = realDice[i].getUpsideValue();
+            console.log(side);
+            faceSum += side;
         // add any non-zero sum to the canvas
         (faceSum === 0) ? changeSum(_ => null) : changeSum(_ => faceSum);
     }
@@ -282,6 +286,17 @@ function DiceCanvas(props) {
         <div id="animation" ref={ mount } onClick={ async () => {
             // throw the dice when the canvas is clicked
             await randomDiceThrow();
+            let s = 0;
+            let dv = []
+            let side = 0;
+            for (let i = 0; i < realDice.length; i++) {
+                side = realDice[i].getUpsideValue();
+                s += side;
+                dv.push({dice: realDice[i], value: side});
+            }
+            DiceManager.prepareValues(dv);
+			console.log(s);
+			(s === 0) ? changeSum(null) : changeSum(s);
         }}/>
         <div id="sum">
             {sum}{/*the sum of the dice will be entered here*/}

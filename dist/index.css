@@ -5,13 +5,23 @@ html {
 	top: 0px;
 	position: absolute;
 	background-color: #5f0f40;
-	overflow: hidden;
+	overflow: auto;
+}
+
+body {
+	padding: 0;
+	margin: 0;
 }
 
 .canvas {
-	border-style: none;
+	border-style: solid;
+	border-size: 5px;
+	border-color: red;
 	display: flex;
 	justify-content: center;
+	border-radius: 10px;
+	border-color: purple;
+	border-style: solid;
 }
 
 .dtab {
@@ -52,13 +62,18 @@ html {
 	font-family: 'Grenze Gotisch', cursive;
 	position: absolute;
 	z-index: 5;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #faa275;
+	border-radius: 3px;
 }
 
 #sum {
-	z-index: 5;
+	z-index: 10;
 	color: white;
 	font-size: 10vw;
 	font-family: 'Grenze Gotisch', cursive;
+	position: fixed;
 }
 
 #dice-controller {
@@ -69,11 +84,12 @@ html {
 }
 
 #selector {
-	width: 65vw;
+	width: 71.5vw;
 	height: 12vh;
 	display: flex;
-	justify-content: space-between;
+	justify-content: space-evenly;
 	background-color: black;
+	border-radius: 10px;
 }
 
 #controller {
@@ -89,10 +105,11 @@ html {
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: center;
-	background-color: #5f0f40;
+	background: #5c374c;
 	width: 100vw;
 	height: 100vh;
 	margin: 0px;
+	padding: 0px;
 	top: 0px;
 	overflow-x: hidden;
 	overflow: hidden;
@@ -107,20 +124,19 @@ html {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	font-size: 8vw;
+	font-size: 6vw;
 	font-family: 'Grenze Gotisch', cursive;
-	background-color: #e36414;
-	color: black;
-	width: 65vw;
-	height: 15vh;
-	border-radius: 10px;
+	background: #985277;
+	color: #faae7b;
+	width: 100vw;
+	height: 12vh;
+	margin-bottom: 25px;
 }
 
 #canv {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	background-color: green;
 	width: 60vw;
 	height: 50vh;
 }
@@ -128,6 +144,9 @@ html {
 #animation {
 	display: flex;
 	justify-content: center;
-	width: 80vw;
-	height: 30vh;
+	width: 71.4vw;
+	height: 71.4vh;
+	border-style: solid;
+	border-color: black;
+	color: white;
 }
