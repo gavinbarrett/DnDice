@@ -63,9 +63,13 @@ body {
 	position: absolute;
 	z-index: 5;
 	border-style: solid;
-	border-width: 1px;
+	border-width: 1.5px;
 	border-color: #faa275;
 	border-radius: 3px;
+}
+
+.dcount:hover {
+	border-color: #ff9065;
 }
 
 #sum {
