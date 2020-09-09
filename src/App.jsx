@@ -14,28 +14,13 @@ function DnDice(props) {
 	// we will pass the die counters into child components as a single object
 	const obj = [ D4, incD4, D6, incD6, D8, incD8, D10, incD10, D12, incD12, D20, incD20 ];
 
-/*
-	const [wind, updateWind] = useState([window.innerWidth, window.innerHeight]);
-	const [iconSize, changeIconSize] = useState(1.5);
-	let wr = () => {
-		updateWind((wind) => {
-			wind[0] = window.innerWidth;
-			wind[1] = window.innerHeight;
-		});
-	}
-	useEffect(() => {
-		alert('calling useEffect');
-	}, [wind]);
-	window.onresize = wr;
-*/
-
 	return(<div id="page">
 	<div id="heading">
 		{props.heading}
 	</div>
-		{/* create the DieSelector which contains six DieTabs for selecting which dice to throw */}
+	{/* create the DieSelector which contains six DieTabs for selecting which dice to throw */}
 	<DieSelector dcount={obj}/>
-		{/* create the DiceCanvas which will display the WebGL animation of dice throws */}
+	{/* create the DiceCanvas which will display the WebGL animation of dice throws */}
 	<DiceCanvas dcount={obj}/>
 	</div>);
 }

@@ -52,7 +52,25 @@ function DieTab(props) {
         // create and initialize the WebGL renderer
         renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth/11, window.innerHeight/11);
-    }
+    	window.addEventListener('resize', updateRendererDimensions);
+	}
+
+	let updateRendererDimensions = () => {
+		const ratio = window.innerWidth/window.innerHeight;
+		// ratio in standard ratio 16:9
+		if (ratio > 1.5)
+			renderer.setSize(window.innerWidth/11, window.innerHeight/11);
+		// ratio in mobile landscape mode
+		else if (ratio > 1.0 && ratio < 1.5)
+			renderer.setSize(window.innerWidth/16, window.innerHeight/16);		
+		// ratio in mobile portrait mode
+		else if (ratio < 1.0)
+			renderer.setSize(window.innerWidth/14, window.innerHeight/14);
+		// fallback sizes
+		else
+			renderer.setSize(window.innerWidth/12, window.innerHeight/12);
+		console.log('Ratio: ', ratio);
+	}
 
     let animate = () => {
         renderer.render(scene, camera);
@@ -112,7 +130,7 @@ function DieTab(props) {
     }, [mount]);
 
     return (<div className='dtab'>
-        <div ref={ mount } className='dtab2' onClick={ () => addDie() }>
+        <div ref={ mount } className='dtab2' onClick={ async () => await addDie() }>
             <div className='dcount'>
                 x{props.num}
             </div>
@@ -139,11 +157,15 @@ function DiceCanvas(props) {
     let world, camera, renderer, mount = [];
     // create a sum variable
     const [sum, changeSum] = useState(null);
-    // create a reference to this object
+    const [width, updateWidth] = useState(0);
+    const [height, updateHeight] = useState(0);
+
+	// create a reference to this object
     mount = useRef(null);
 
     let init = () => {
-        // set up a CANNON world with gravity and initialize the DiceManager
+        console.log(width,height);
+		// set up a CANNON world with gravity and initialize the DiceManager
         setupWorld(true);
         // create a perspective camera
         setupCamera();
@@ -213,13 +235,28 @@ function DiceCanvas(props) {
         camera.zoom = 300;
     }
 
-    let setupRenderer = () => {
+    let setupRenderer = async () => {
         // initialize the WebGL renderer
-        //props.upr(_ => props.r.setSize(window.innerWidth/1.5, window.innerHeight/1.5));
         renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth/1.4, window.innerHeight/1.4);
-        //props.r.current.setSize(window.innerWidth/1.5, window.innerHeight/1.5);
+		// set up the initial renderer
+		renderer.setSize(window.innerWidth/1.2, window.innerHeight/1.1);
+		// add a renderer resize event listener
+		window.addEventListener('resize', updateRendererDimensions);
     }
+
+	let updateRendererDimensions = async () => {
+		const ratio = window.innerWidth/window.innerHeight;
+		if (ratio > 1.5)
+			renderer.setSize(window.innerWidth/1.4, window.innerHeight/1.4);
+		else if (ratio > 1.0 && ratio < 1.5)
+			renderer.setSize(window.innerWidth/1.3, window.innerHeight/1.75);
+				
+		else if (ratio < 1.0)
+			renderer.setSize(window.innerWidth/1.2, window.innerHeight/1.1);
+		else
+			renderer.setSize(window.innerWidth/1.3, window.innerHeight/1.3);
+		console.log('Ratio: ', ratio);
+	}
 
     let updatePhysics = () => {
         // increment the CANNON world step
@@ -279,7 +316,10 @@ function DiceCanvas(props) {
 
     useEffect(() => {
         // initialize necessary variables
-        init();
+		window.addEventListener('deviceorientation', function(e) {
+			console.log(event.alpha, event.beta, event.gamma);
+		}, true);
+		init();
     }, []); // passing a second argument forces useEffect to run only once
 
     return(<div id="dice-controller">
@@ -305,6 +345,6 @@ function DiceCanvas(props) {
 }
 
 export {
-    DieSelector,
-    DiceCanvas
+    DiceCanvas,
+    DieSelector
 }

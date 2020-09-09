@@ -82,6 +82,8 @@ body {
 
 #dice-controller {
 	display: flex;
+	width: 100vw;
+	height: 78vh;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
@@ -150,7 +152,5 @@ body {
 	justify-content: center;
 	width: 71.4vw;
 	height: 71.4vh;
-	border-style: solid;
-	border-color: black;
 	color: white;
 }

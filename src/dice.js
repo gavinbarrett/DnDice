@@ -93,7 +93,7 @@ class DiceObject {
      */
     constructor(options) {
         options = this.setDefaults(options, {
-            size: 100,
+            size: 50,
             fontColor: '#000000',
             backColor: '#ffffff'
         });
