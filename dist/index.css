@@ -13,17 +13,6 @@ body {
 	margin: 0;
 }
 
-.canvas {
-	border-style: solid;
-	border-size: 5px;
-	border-color: red;
-	display: flex;
-	justify-content: center;
-	border-radius: 10px;
-	border-color: purple;
-	border-style: solid;
-}
-
 .dtab {
 	display: flex;
 	justify-content: center;
