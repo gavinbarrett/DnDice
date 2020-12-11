@@ -72,12 +72,12 @@ function DieTab(props) {
 		console.log('Ratio: ', ratio);
 	}
 
-    let animate = () => {
-        renderer.render(scene, camera);
+    let animate = async () => {
+        await renderer.render(scene, camera);
         die.getObject().rotation.y += 0.01;
         die.getObject().rotation.z += 0.01;
-        die.updateBodyFromMesh();
-        requestAnimationFrame(animate);
+        await die.updateBodyFromMesh();
+        await requestAnimationFrame(animate);
     }
 
     let createDie = () => {
