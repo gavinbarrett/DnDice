@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { DiceD10, DiceD12, DiceD20, DiceD4, DiceD6, DiceD8, DiceManager } from "./dice";
 
 const realScene = new THREE.Scene();
