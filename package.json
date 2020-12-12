@@ -17,16 +17,16 @@
   "dependencies": {
     "cannon": "^0.6.2",
     "express": "^4.17.1",
-    "nodemon": "^2.0.4",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "nodemon": "^2.0.6",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "three": "^0.118.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.10.5",
-    "@babel/preset-react": "^7.10.4",
-    "babel-loader": "^8.1.0",
-    "webpack": "^4.43.0",
+    "@babel/core": "^7.12.10",
+    "@babel/preset-react": "^7.12.10",
+    "babel-loader": "^8.2.2",
+    "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12"
   }
 }
