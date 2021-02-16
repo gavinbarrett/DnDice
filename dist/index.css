@@ -143,3 +143,8 @@ body {
 	height: 71.4vh;
 	color: white;
 }
+
+canvas {
+	border: 5px solid black;
+	border-radius: 30px;
+}
